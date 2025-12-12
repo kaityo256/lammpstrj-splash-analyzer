@@ -1,13 +1,19 @@
+#include <fstream>
 #include <lammpstrj/lammpstrj.hpp>
+#include <map>
 #include <numeric>
 #include <vector>
+
 class DropletClusterCounter {
 private:
   std::string filename_;
+  int frame_;
+  std::ofstream ofs_;
   DropletClusterCounter(const std::string &filename) {
     filename_ = filename;
+    frame_ = 0;
+    ofs_.open("droplet_count.dat");
   }
-
   int find(int index, std::vector<int> &cluster) {
     while (index != cluster[index]) {
       index = cluster[index];
@@ -46,9 +52,22 @@ private:
     }
     for (int i = 0; i < number_of_atoms; i++) {
       cluster[i] = find(i, cluster);
-      printf("%d %d\n", i, cluster[i]);
     }
-    exit(1);
+    std::map<int, int> root_size;
+    for (int i = 0; i < number_of_atoms; i++) {
+      root_size[cluster[i]]++;
+    }
+    std::map<int, int> size_distribution;
+    for (auto it = root_size.begin(); it != root_size.end(); ++it) {
+      size_distribution[it->second]++;
+    }
+    int num_cluster = 0;
+    for (const auto &kv : size_distribution) {
+      num_cluster += kv.second;
+    }
+    printf("%d %d\n", frame_, num_cluster);
+    ofs_ << frame_ << " " << num_cluster << std::endl;
+    frame_++;
   }
 
   void count_cluster(const std::unique_ptr<lammpstrj::SystemInfo> &si,
