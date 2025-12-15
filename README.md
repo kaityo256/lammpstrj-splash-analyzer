@@ -23,7 +23,7 @@ make
 すると、`splashcount`というファイルができるので、それをdroplet.lammpstrjのあるところで実行する。
 
 ```sh
-~/github/lammpstrj-splash-analyzer impact.lammpstrj
+~/github/lammpstrj-splash-analyzer/splashcount impact.lammpstrj
 ```
 
 すると、そこに`droplet_count.dat`ができる。これが、フレームごとのクラスター数となる。
